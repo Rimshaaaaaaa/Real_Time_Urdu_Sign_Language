@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+node_modules/
+temp_videos/
+build/
+dist/
+.DS_Store
+venv/ 
