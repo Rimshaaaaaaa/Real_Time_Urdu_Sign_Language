@@ -100,7 +100,7 @@ function SignToText() {
 
     setTimeout(() => {
       mediaRecorder.stop();
-    }, 1200); // ⏱️ Record for 3 seconds
+    }, 3000); // ⏱️ Record for 3 seconds
   };
 
   return (
