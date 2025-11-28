@@ -8,15 +8,12 @@ services:
     runtime: python
     plan: free
     rootDir: ml_model
-    
-
     buildCommand: ""
     startCommand: >
       gunicorn sign_model_api:create_app
       --workers 2 --threads 4
       --bind 0.0.0.0:$PORT
       --timeout 120
-
     envVars:
       - key: MODEL_DIR
         value: ml_model
@@ -29,21 +26,26 @@ services:
     name: frontend
     plan: free
     rootDir: frontend
+    runtime: static
     buildCommand: npm install && npm run build
     staticPublishPath: build
-
     envVars:
-      - key: REACT_APP_BACKEND_URL
+      - key: REACT_APP_BACKEND_HOST
         fromService:
           name: backend
-          type: web
-          property: url
-
-      - key: REACT_APP_ML_SERVICE_URL
+          property: host
+      - key: REACT_APP_BACKEND_PORT
         fromService:
-          name: ml-service
-          type: web
-          property: url
+          name: backend
+          property: port
+      - key: REACT_APP_ML_SERVICE_HOST
+        fromService:
+          name: urdu-sign-api
+          property: host
+      - key: REACT_APP_ML_SERVICE_PORT
+        fromService:
+          name: urdu-sign-api
+          property: port
 
 
   # ======================================
@@ -56,19 +58,15 @@ services:
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn server:app --bind 0.0.0.0:$PORT
-
     envVars:
-      - key: ML_SERVICE_URL
-        fromService:
-          name: ml-service
-          type: web
-          property: url
-
-      - key: MODEL_API_URL
+      - key: ML_SERVICE_HOST
         fromService:
           name: urdu-sign-api
-          type: web
-          property: url
+          property: host
+      - key: ML_SERVICE_PORT
+        fromService:
+          name: urdu-sign-api
+          property: port
 
 
   # ======================================
@@ -81,7 +79,6 @@ services:
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn sign_model_api:create_app --bind 0.0.0.0:$PORT
-
     envVars:
       - key: MODEL_DIR
         value: ../ml_model
