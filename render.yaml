@@ -1,9 +1,9 @@
 services:
-  # Flask API Service
+  # Flask API Service (Dynamic backend)
   - type: web
     name: flask-api
     env: python
-    plan: starter
+    plan: free  # Set plan to free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python app.py"
     envVars:
@@ -14,23 +14,24 @@ services:
     regions:
       - us
     routes:
-      - "/api/*"  # Any route prefixed with /api/ will be routed to this API
+      - "/api/*"  # Route API calls to this service
 
-  # Frontend Service (React, Vue, etc.)
+  # Frontend Service (Static Site for React, Vue, or Angular)
   - type: static_site
     name: frontend
-    buildCommand: "npm install && npm run build"
-    publishDirectory: "build"  # Adjust if using a different build tool
+    plan: free  # Set plan to free
+    buildCommand: "npm install && npm run build"  # For React/Vue/Angular
+    publishDirectory: "build"  # The output directory after build (typically "build" for React)
     envVars:
       - key: NODE_ENV
         value: production
     regions:
       - us
 
-  # Backend Database Service (PostgreSQL)
+  # Backend Database Service (PostgreSQL for backend)
   - type: database
     name: my-database
-    plan: free
+    plan: free  # Set plan to free
     dbType: postgres
     dbName: mydatabase
     envVars:
