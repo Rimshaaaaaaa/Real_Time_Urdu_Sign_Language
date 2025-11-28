@@ -6,7 +6,6 @@ services:
   - type: web
     name: urdu-sign-api
     runtime: python
-    plan: starter  # "starter" is Render's free web service plan
     rootDir: ml_model
     buildCommand: ""
     startCommand: >
@@ -25,7 +24,6 @@ services:
   - type: web
     name: frontend
     runtime: static
-    plan: starter
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
@@ -58,7 +56,6 @@ services:
   - type: web
     name: backend
     runtime: python
-    plan: starter
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn server:app --bind 0.0.0.0:$PORT
@@ -81,7 +78,6 @@ services:
   - type: web
     name: ml-service
     runtime: python
-    plan: starter
     rootDir: ml_service
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn sign_model_api:create_app --bind 0.0.0.0:$PORT
