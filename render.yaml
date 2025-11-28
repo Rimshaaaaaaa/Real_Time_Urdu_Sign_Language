@@ -1,33 +1,46 @@
 services:
-
-  # ======================================
-  # 1) FRONTEND (React) - Served as static web
-  # ======================================
+  # Flask API Service
   - type: web
+    name: flask-api
+    env: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        value: "postgres://admin:password123@localhost:5432/mydatabase"
+    regions:
+      - us
+    routes:
+      - "/api/*"  # Any route prefixed with /api/ will be routed to this API
+
+  # Frontend Service (React, Vue, etc.)
+  - type: static_site
     name: frontend
-    runtime: node
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    startCommand: npx serve -s build -l $PORT
+    buildCommand: "npm install && npm run build"
+    publishDirectory: "build"  # Adjust if using a different build tool
     envVars:
-      - key: REACT_APP_BACKEND_HOST
-        value: backend-ml
-      - key: REACT_APP_BACKEND_PORT
-        value: $PORT
+      - key: NODE_ENV
+        value: production
+    regions:
+      - us
 
-  # ======================================
-  # 2) BACKEND + ML SERVICE COMBINED
-  # ======================================
-  - type: web
-    name: backend-ml
-    runtime: python
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: >
-      gunicorn server:app
-      --workers 2 --threads 4
-      --bind 0.0.0.0:$PORT
-      --timeout 120
+  # Backend Database Service (PostgreSQL)
+  - type: database
+    name: my-database
+    plan: free
+    dbType: postgres
+    dbName: mydatabase
     envVars:
-      - key: MODEL_DIR
-        value: ../ml_model
+      - key: DB_HOST
+        value: "localhost"
+      - key: DB_USER
+        value: "admin"
+      - key: DB_PASSWORD
+        value: "password123"
+      - key: DB_NAME
+        value: "mydatabase"
+    regions:
+      - us
