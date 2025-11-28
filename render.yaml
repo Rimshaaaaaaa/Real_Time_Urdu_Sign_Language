@@ -10,11 +10,7 @@ services:
       - key: FLASK_ENV
         value: production
       - key: DATABASE_URL
-        value: "YOUR_DATABASE_URL_HERE"  # Replace this with the actual DATABASE_URL from the Render dashboard
-    regions:
-      - us
-    routes:
-      - "/api/*"  # Route API calls to this service
+        value: "YOUR_DATABASE_URL_HERE"  # Replace with actual DATABASE_URL from Render dashboard
 
   # Frontend Service (Static site, treated as a web service)
   - type: web  # Change from static_site to web
@@ -22,9 +18,6 @@ services:
     plan: free  # Set plan to free
     buildCommand: "npm install && npm run build"  # For React/Vue/Angular
     startCommand: "npm start"  # Typically, React/Vue apps use "npm start" or "serve -s build"
-    publishDirectory: "build"  # The output directory after build (typically "build" for React)
     envVars:
       - key: NODE_ENV
         value: production
-    regions:
-      - us
