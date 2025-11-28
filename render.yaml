@@ -2,7 +2,7 @@ services:
   # Flask API Service (Dynamic backend)
   - type: web
     name: flask-api
-    env: python
+    runtime: python  # Set runtime to Python for Flask
     plan: free  # Set plan to free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python app.py"
@@ -15,6 +15,7 @@ services:
   # Frontend Service (Static site, treated as a web service)
   - type: web  # Change from static_site to web
     name: frontend
+    runtime: node  # Set runtime to Node for the frontend
     plan: free  # Set plan to free
     buildCommand: "npm install && npm run build"  # For React/Vue/Angular
     startCommand: "npm start"  # Typically, React/Vue apps use "npm start" or "serve -s build"
