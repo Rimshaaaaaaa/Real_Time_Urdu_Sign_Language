@@ -1,23 +1,87 @@
-# render.yaml  – declarative configuration for Render
-#
-# Commit this at the *root* of your repo and push.
-# Render will auto-detect it and create/update the service.
-
 services:
+
+  # ======================================
+  # 1) EXISTING ML MODEL SERVICE (unchanged)
+  # ======================================
   - type: web
-    name: urdu-sign-api           # <-- any unique name
+    name: urdu-sign-api
     runtime: python
-    plan: free                    # Free tier; bump if you need more RAM
-    rootDir: ml_model             # <-- folder that holds requirements.txt, runtime.txt
-    pythonVersion: 3.11.9         # <-- pins the interpreter (same effect as runtime.txt)
-    
-    buildCommand: ""              # Empty → Render runs pip install -r requirements.txt
+    plan: free
+    rootDir: ml_model
+    pythonVersion: 3.11.9
+
+    buildCommand: ""
     startCommand: >
       gunicorn sign_model_api:create_app
       --workers 2 --threads 4
       --bind 0.0.0.0:$PORT
       --timeout 120
 
-    envVars:                      # (Optional) add any environment variables here
+    envVars:
       - key: MODEL_DIR
         value: ml_model
+
+
+  # ======================================
+  # 2) FRONTEND (React)
+  # ======================================
+  - type: web
+    name: frontend
+    plan: free
+    rootDir: frontend   # folder for your React project
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+
+    envVars:
+      - key: REACT_APP_BACKEND_URL
+        fromService:
+          name: backend
+          type: web
+          property: url
+
+      - key: REACT_APP_ML_SERVICE_URL
+        fromService:
+          name: ml-service
+          type: web
+          property: url
+
+
+  # ======================================
+  # 3) BACKEND (Flask main API)
+  # ======================================
+  - type: web
+    name: backend
+    plan: free
+    rootDir: backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+
+    envVars:
+      - key: ML_SERVICE_URL
+        fromService:
+          name: ml-service
+          type: web
+          property: url
+
+      - key: MODEL_API_URL
+        fromService:
+          name: urdu-sign-api
+          type: web
+          property: url
+
+
+  # ======================================
+  # 4) ML SERVICE (Flask microservice)
+  # ======================================
+  - type: web
+    name: ml-service
+    plan: free
+    rootDir: ml_service
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+
+    envVars:
+      - key: MODEL_DIR
+        value: ../ml_model
