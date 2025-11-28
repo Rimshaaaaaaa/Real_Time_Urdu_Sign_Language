@@ -16,11 +16,12 @@ services:
     routes:
       - "/api/*"  # Route API calls to this service
 
-  # Frontend Service (Static Site for React, Vue, or Angular)
-  - type: static_site
+  # Frontend Service (Static site, treated as a web service)
+  - type: web  # Change from static_site to web
     name: frontend
     plan: free  # Set plan to free
     buildCommand: "npm install && npm run build"  # For React/Vue/Angular
+    startCommand: "npm start"  # Typically, React/Vue apps use "npm start" or "serve -s build"
     publishDirectory: "build"  # The output directory after build (typically "build" for React)
     envVars:
       - key: NODE_ENV
