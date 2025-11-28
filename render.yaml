@@ -10,7 +10,7 @@ services:
       - key: FLASK_ENV
         value: production
       - key: DATABASE_URL
-        value: "postgres://admin:password123@localhost:5432/mydatabase"
+        value: "postgres://admin:password123@localhost:5432/mydatabase"  # Use this format for Postgres URL
     regions:
       - us
     routes:
@@ -29,11 +29,10 @@ services:
     regions:
       - us
 
-  # Backend Database Service (PostgreSQL for backend)
-  - type: database
+  # PostgreSQL Database Service
+  - type: postgres
     name: my-database
     plan: free  # Set plan to free
-    dbType: postgres
     dbName: mydatabase
     envVars:
       - key: DB_HOST
