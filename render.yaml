@@ -1,18 +1,19 @@
 services:
 
   # ======================================
-  # 1) FRONTEND (React) - Free static site
+  # 1) FRONTEND (React) - Served as static web
   # ======================================
-  - type: static
+  - type: web
     name: frontend
+    runtime: node
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: build
+    startCommand: npx serve -s build -l $PORT
     envVars:
       - key: REACT_APP_BACKEND_HOST
         value: backend-ml
       - key: REACT_APP_BACKEND_PORT
-        value: "10000"  # optional if backend runs on default PORT
+        value: $PORT
 
   # ======================================
   # 2) BACKEND + ML SERVICE COMBINED
