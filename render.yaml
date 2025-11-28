@@ -1,7 +1,7 @@
 services:
 
   # ======================================
-  # 1) EXISTING ML MODEL SERVICE (unchanged)
+  # 1) EXISTING ML MODEL SERVICE
   # ======================================
   - type: web
     name: urdu-sign-api
@@ -28,7 +28,7 @@ services:
   - type: web
     name: frontend
     plan: free
-    rootDir: frontend   # folder for your React project
+    rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
 
@@ -55,7 +55,7 @@ services:
     rootDir: backend
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn server:app --bind 0.0.0.0:$PORT
 
     envVars:
       - key: ML_SERVICE_URL
@@ -72,7 +72,7 @@ services:
 
 
   # ======================================
-  # 4) ML SERVICE (Flask microservice)
+  # 4) ML SERVICE (Flask micro-model service)
   # ======================================
   - type: web
     name: ml-service
@@ -80,7 +80,7 @@ services:
     rootDir: ml_service
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn sign_model_api:create_app --bind 0.0.0.0:$PORT
 
     envVars:
       - key: MODEL_DIR
