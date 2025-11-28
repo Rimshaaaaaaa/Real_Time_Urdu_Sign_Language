@@ -1,86 +1,32 @@
 services:
 
   # ======================================
-  # 1) EXISTING ML MODEL SERVICE
+  # 1) FRONTEND (React) - Free static site
   # ======================================
-  - type: web
-    name: urdu-sign-api
-    runtime: python
-    rootDir: ml_model
-    buildCommand: ""
-    startCommand: >
-      gunicorn sign_model_api:create_app
-      --workers 2 --threads 4
-      --bind 0.0.0.0:$PORT
-      --timeout 120
-    envVars:
-      - key: MODEL_DIR
-        value: ml_model
-
-
-  # ======================================
-  # 2) FRONTEND (React)
-  # ======================================
-  - type: web
+  - type: static
     name: frontend
-    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
     envVars:
       - key: REACT_APP_BACKEND_HOST
-        fromService:
-          name: backend
-          type: web
-          property: host
+        value: backend-ml
       - key: REACT_APP_BACKEND_PORT
-        fromService:
-          name: backend
-          type: web
-          property: port
-      - key: REACT_APP_ML_SERVICE_HOST
-        fromService:
-          name: urdu-sign-api
-          type: web
-          property: host
-      - key: REACT_APP_ML_SERVICE_PORT
-        fromService:
-          name: urdu-sign-api
-          type: web
-          property: port
-
+        value: "10000"  # optional if backend runs on default PORT
 
   # ======================================
-  # 3) BACKEND (Flask main API)
+  # 2) BACKEND + ML SERVICE COMBINED
   # ======================================
   - type: web
-    name: backend
+    name: backend-ml
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn server:app --bind 0.0.0.0:$PORT
-    envVars:
-      - key: ML_SERVICE_HOST
-        fromService:
-          name: urdu-sign-api
-          type: web
-          property: host
-      - key: ML_SERVICE_PORT
-        fromService:
-          name: urdu-sign-api
-          type: web
-          property: port
-
-
-  # ======================================
-  # 4) ML SERVICE (Flask micro-model service)
-  # ======================================
-  - type: web
-    name: ml-service
-    runtime: python
-    rootDir: ml_service
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn sign_model_api:create_app --bind 0.0.0.0:$PORT
+    startCommand: >
+      gunicorn server:app
+      --workers 2 --threads 4
+      --bind 0.0.0.0:$PORT
+      --timeout 120
     envVars:
       - key: MODEL_DIR
         value: ../ml_model
