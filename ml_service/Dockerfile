@@ -1,5 +1,5 @@
-# Use official Python 3.9 slim image
-FROM python:3.9-slim
+# Use Python 3.10 slim for compatibility with latest mediapipe
+FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
@@ -17,17 +17,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
+# Copy requirements
 COPY requirements.txt .
 
+# Upgrade pip
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
 
-# Copy the rest of the application code
+# Install compatible mediapipe first
+RUN pip install mediapipe==0.10.15
+
+# Install the rest of the requirements without reinstalling mediapipe
+RUN pip install -r requirements.txt --no-deps
+
+# Copy the entire project
 COPY . /app
 
-# Make Python output unbuffered (good for logs)
+# Ensure Python prints logs immediately
 ENV PYTHONUNBUFFERED=1
 
-# Default command to run the API
+# Command to run the API
 CMD ["python", "sign_model_api.py"]
